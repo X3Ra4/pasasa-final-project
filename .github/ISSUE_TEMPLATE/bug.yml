@@ -1,0 +1,17 @@
+name: Помилка
+description: Повідомити про відтворювану помилку TaskFlow
+labels: [bug]
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: Кроки відтворення
+      description: Роль користувача, сторінка та послідовність дій. Не додавайте паролі або токени.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Очікуваний та фактичний результат
+    validations:
+      required: true

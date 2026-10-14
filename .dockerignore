@@ -1,0 +1,15 @@
+.git
+.venv
+.work
+.superpowers
+__pycache__
+*.pyc
+*.sqlite3
+.local-secret
+.env
+.env.*
+staticfiles
+screenshots
+backups
+*.pem
+*.key

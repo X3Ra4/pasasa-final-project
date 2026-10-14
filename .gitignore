@@ -1,0 +1,15 @@
+.venv/
+.work/
+.superpowers/
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+.env.*
+!.env.example
+.local-secret
+staticfiles/
+*.pem
+*.key
+*.log
+backups/

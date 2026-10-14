@@ -1,0 +1,23 @@
+{% load static %}<!doctype html>
+<html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}TaskFlow — простір для вашої команди{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'app.css' %}"><script defer src="{% static 'app.js' %}"></script></head>
+<body><a href="#main" class="skip-link">До основного вмісту</a>
+{% if user.is_authenticated %}
+<aside class="sidebar"><a class="brand" href="{% url 'dashboard' %}"><span class="brand-mark">t.</span>TaskFlow<span class="brand-dot">•</span></a>
+<div class="workspace-label">ВАШ РОБОЧИЙ ПРОСТІР</div>
+<nav aria-label="Основна навігація"><a class="nav-item {% if not project %}selected{% endif %}" href="{% url 'dashboard' %}"><span>◫</span> Огляд проєктів</a>
+{% if project %}<a class="nav-item selected" href="{% url 'project' project.pk %}"><span>▦</span> Дошка проєкту</a>{% endif %}
+<a class="nav-item" href="{% url 'project_new' %}"><span>＋</span> Створити проєкт</a>
+<a class="nav-item" href="/api/"><span>⌘</span> REST API</a>
+{% if user.is_staff %}<a class="nav-item" href="/admin/"><span>⚙</span> Адміністрування</a>{% endif %}</nav>
+<div class="sidebar-note"><span class="spark">✳</span><strong>Великі ідеї.<br>Зрозумілі кроки.</strong><p>Зосередьтеся на наступному завданні — і рухайтеся вперед.</p></div>
+<div class="account"><span class="avatar">{{ user.username|first|upper }}</span><div><strong>{{ user.username }}</strong><small>Особистий кабінет</small></div>
+<form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout" title="Вийти" aria-label="Вийти">↗</button></form></div></aside>
+{% endif %}
+<main id="main" class="{% if user.is_authenticated %}main-content{% else %}auth-content{% endif %}">
+{% if user.is_authenticated %}<header class="topbar"><span>Робочий простір <span class="crumb">/</span> {% if project %}{{ project.name }}{% else %}Огляд{% endif %}</span><span class="topbar-tag">Зробімо це разом <span class="online-dot"></span></span></header>{% endif %}
+<div class="content-wrap">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}" role="status">{{ message }}</div>{% endfor %}
+{% block content %}{% endblock %}</div><footer>TaskFlow <span>·</span> Менше хаосу. Більше результату.</footer></main>
+</body></html>

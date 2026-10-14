@@ -1,0 +1,45 @@
+name: TaskFlow checks
+on:
+  push:
+    branches: [taskflow-team-project]
+  pull_request:
+    branches: [taskflow-team-project]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: taskflow
+          POSTGRES_USER: taskflow
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U taskflow -d taskflow"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DJANGO_DEBUG: '0'
+      DJANGO_SECRET_KEY: 'ci-only-disposable-secret-not-used-in-any-deployment-1234567890'
+      DJANGO_ALLOWED_HOSTS: 'localhost,127.0.0.1,testserver'
+      DJANGO_HTTPS: '0'
+      POSTGRES_HOST: localhost
+      POSTGRES_DB: taskflow
+      POSTGRES_USER: taskflow
+      POSTGRES_PASSWORD: ci-only-password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pip check
+      - run: python manage.py collectstatic --noinput
+      - run: python manage.py makemigrations --check --dry-run
+      - run: python manage.py test --verbosity 2
+      - run: python manage.py check --deploy --fail-level WARNING
+        env:
+          DJANGO_HTTPS: '1'
