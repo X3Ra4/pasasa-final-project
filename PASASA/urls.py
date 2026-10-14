@@ -22,11 +22,13 @@ from django.views.generic import RedirectView
 
 from maps import views as map_views
 from accounts.views import signup
+from maps.health import health
 from django.contrib.auth.views import LoginView, LogoutView
 
 handler404 = "maps.views.not_found_page"
 
 urlpatterns = [
+    path('healthz/', health, name='health'),
     path('catalog/', include('maps.catalog_urls')),
     path('accounts/signup/', signup, name='signup'),
     path('accounts/login/', LoginView.as_view(), name='login'),

@@ -1,162 +1,104 @@
-# PASASA — каталог карт і локацій ARK
+﻿# PASASA Cloud — фінальний проєкт AWS
 
-Фінальний проєкт з розробки вебзастосунків на Python: інтерактивні карти **ARK: Survival Ascended**, каталог PvP/PvE-локацій, оцінки гравців та обране.
+**Тема:** «Хмарна платформа PASASA для пошуку та оцінювання ігрових локацій ARK: Survival Ascended на базі AWS EC2».
 
-**Тема:** «PASASA — вебзастосунок для пошуку, створення та оцінювання ігрових локацій ARK: Survival Ascended».
+Гілка **cloud-solutions-aws** призначена для Cloud Solutions. Версія Python Web залишається у [main](https://github.com/X3Ra4/pasasa-final-project/tree/main).
 
-Мета — допомогти гравцям обирати місця для баз, переглядати їхні координати й характеристики та ділитися власними локаціями. Реалізація використовує Django Templates: сервер формує HTML-сторінки, а JavaScript забезпечує інтерактивну карту, фільтри, оцінювання й обране.
+> **Статус:** застосунок і конфігурації підготовлено. Реальний EC2 ще не розгорнуто: доступ до сервера не надано. Локальна Linux-перевірка не замінює обов’язковий запуск в AWS.
 
-![Каталог карт](screenshots/01-maps.png)
+PASASA надає інтерактивні карти ARK, каталог PvP/PvE-локацій, пошук, CRUD, оцінки та обране. Хмарна частина забезпечує доступ через веббраузер, PostgreSQL, автозапуск застосунку, оновлення з GitHub та зберігання секретів поза кодом.
 
-## Можливості
+- [Опис теми для здачі](docs/PROJECT_TOPIC.md)
+- [Повна інструкція EC2, systemd, Nginx і HTTPS](docs/CLOUD_DEPLOYMENT.md)
+- [Сценарій захисту та докази](docs/CLOUD_DEFENSE.md)
+- [Функції застосунку і локальний запуск](docs/PYTHON_WEB_README.md)
 
-- Каталоги карт, PvP-локацій (`Spot`) та PvE-локацій (`Place`).
-- Повний CRUD для кожної основної моделі: список, деталі, створення, редагування, підтверджене видалення.
-- Текстовий пошук за назвою та slug, фільтрація за картою, сортування, пагінація по 12 записів.
-- Інтерактивні карти з маркерами, характеристиками локацій, оцінками та обраним.
-- Реєстрація, вхід, вихід, профіль, зміна пароля та аватара.
-- Автор керує своїми локаціями; адміністратор (`is_staff`) керує картами та всіма локаціями.
-- Django Admin для довідників, медіа, оцінок та користувачів, із пошуком і фільтрами.
-- Зображення карт, фотографії та відео локацій; новини гри із зовнішнього джерела.
-
-## Стек
-
-Python **3.12**, Django **5.2.18 LTS**, SQLite, Django Templates, HTML, CSS, JavaScript, Pillow. Точні версії залежностей зафіксовано в `requirements.txt`.
-
-## Запуск на Windows (PowerShell)
-
-```powershell
-git clone https://github.com/X3Ra4/pasasa-final-project.git
-cd pasasa-final-project
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe manage.py migrate
-.\.venv\Scripts\python.exe manage.py seed_demo
-.\.venv\Scripts\python.exe manage.py createsuperuser
-.\.venv\Scripts\python.exe manage.py runserver
-```
-
-Активація віртуального середовища не потрібна. `createsuperuser` запропонує задати ім’я та пароль адміністратора; готових паролів у репозиторії немає.
-
-## Запуск на Linux / macOS
-
-```bash
-git clone https://github.com/X3Ra4/pasasa-final-project.git
-cd pasasa-final-project
-python3.12 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python manage.py migrate
-.venv/bin/python manage.py seed_demo
-.venv/bin/python manage.py createsuperuser
-.venv/bin/python manage.py runserver
-```
-
-Після запуску:
-
-| Адреса | Призначення |
-| --- | --- |
-| http://127.0.0.1:8000/ | Початкова сторінка карт PvP |
-| http://127.0.0.1:8000/catalog/maps/ | Каталог і керування картами |
-| http://127.0.0.1:8000/catalog/spots/ | Каталог і керування PvP-локаціями |
-| http://127.0.0.1:8000/catalog/places/ | Каталог і керування PvE-локаціями |
-| http://127.0.0.1:8000/accounts/signup/ | Реєстрація звичайного користувача |
-| http://127.0.0.1:8000/accounts/login/ | Вхід користувача або адміністратора |
-| http://127.0.0.1:8000/admin/ | Адміністрування довідників та медіа |
-
-## Демонстраційні дані
-
-`seed_demo` створює 9 карт, 6 PvP-локацій, 6 PvE-локацій та необхідні довідники. Координати й характеристики локацій **вигадані для демонстрації** — це не перевірений ігровий гайд. Команда не створює користувачів і паролів. Її можна виконувати повторно: наявні записи та зміни користувача зберігаються.
-
-Демонстраційні локації не мають автора, тому редагувати їх може адміністратор. Щоб перевірити права звичайного користувача, зареєструйтеся та створіть власну локацію кнопкою «+ Додати».
-
-Для додавання зображень/відео локацій увійдіть у `/admin/` і використайте `Spot media` або `Place media`. Для нової карти обкладинка приймає AVIF, а зображення карти — JPG/JPEG. Координати локацій у формах каталогу обмежено діапазоном 0–100.
-
-## Моделі та зв’язки
+## Архітектура
 
 ```mermaid
-erDiagram
-    Map ||--o{ Spot : contains
-    Map ||--o{ Place : contains
-    User o|--o{ Spot : creates
-    User o|--o{ Place : creates
-    Spot ||--o{ SpotMedia : has
-    Place ||--o{ PlaceMedia : has
-    Spot ||--o{ SpotUserRating : receives
-    Place ||--o{ PlaceUserRating : receives
-    User ||--o{ SpotUserRating : submits
-    User ||--o{ PlaceUserRating : submits
+flowchart LR
+    Browser[Браузер] -->|HTTP / HTTPS| Nginx
+    GitHub[GitHub: cloud-solutions-aws] -->|git clone / pull| Code
+    subgraph EC2[AWS EC2 · Ubuntu 24.04]
+        Code[Код /opt/pasasa]
+        Nginx -->|127.0.0.1:8001| App[Gunicorn + Django]
+        Service[systemd: pasasa.service] --> App
+        Env[EnvironmentFile: /etc/pasasa/.env] --> Service
+        App -->|127.0.0.1:5432| DB[(PostgreSQL)]
+        Nginx --> Files[Static / Media]
+    end
+    EBS[EBS: постійний диск] --- DB
+    EBS --- Files
 ```
 
-Типи, особливості, розташування відносно води, динозаври та кількість входів зберігаються в окремих довідниках. Особливості й обране використовують зв’язки Many-to-Many. Для кожного користувача дозволено одну оцінку конкретної локації; повторне оцінювання її оновлює.
+AWS-сервіси запланованої інфраструктури: **EC2** — обчислення, **EBS** — диск; **VPC / Security Groups** — мережевий доступ. PostgreSQL встановлюється на EC2, без RDS/DynamoDB. AWS access keys у застосунку не потрібні.
 
 ## Відповідність завданню
 
-[Умови фінального проєкту](https://github.com/svitlyi-itstep/PythonWebP35/blob/main/FinalProject.md).
+[Вимоги CloudSolutionsP35](https://github.com/svitlyi-itstep/CloudSolutionsP35/blob/main/FinalProject.md).
 
-| Вимога | Реалізація |
+| Вимога | Реалізація / стан |
 | --- | --- |
-| Django Templates або DRF | Django Templates; `templates/` |
-| Щонайменше дві пов’язані моделі, база даних | `Map`, `Spot`, `Place`, `User`; SQLite; міграції в репозиторії |
-| Моделі зареєстровані в Admin | `maps/admin.py`, `accounts/admin.py` |
-| Повний CRUD основних моделей | `maps/catalog.py`, `maps/forms.py`, `maps/catalog_urls.py`; HTML-сторінки `/catalog/` |
-| Мінімум два види складних запитів | Пошук через `Q` / `icontains`, фільтр за картою, `order_by`; `maps/catalog.py` |
-| Зрозумілий інтерфейс, форми | Каталоги, сторінки деталей, валідовані форми та підтвердження видалення |
-| README та інструкція | Цей файл |
-| Скриншоти роботи | `screenshots/`, приклади нижче |
-| Додатково | Авторизація й ролі, пагінація, ModelForm, налаштований Admin, завантаження медіа |
+| Реальний EC2 із застосунком | Інструкція та bootstrap готові; фактичний запуск очікується |
+| БД на EC2 або DynamoDB | PostgreSQL на localhost; PASASA/settings_cloud.py |
+| GitHub і deploy через clone/pull | bootstrap.sh та update.sh використовують цю гілку |
+| systemd та автозапуск | pasasa.service; systemctl enable --now pasasa |
+| Секрети й endpoint БД у .env через EnvironmentFile | /etc/pasasa/.env, режим 0640; приклад без робочих секретів |
+| .gitignore виключає секрети | .env, приватні ключі, БД, оточення, резервні копії виключені |
+| README, опис, AWS-сервіси, інструкція | Цей файл і docs/CLOUD_DEPLOYMENT.md |
+| Зафіксовані залежності | requirements.txt + requirements-cloud.txt |
+| GitHub Actions (бажано) | Автоматичний deploy не налаштований; використовується ручний git pull |
 
-Карту, яка має локації, не можна видалити: потрібно спочатку перенести або видалити залежні локації. Видалення записів здійснюється POST-запитом після підтвердження; форми захищені CSRF.
+## Швидкий старт на EC2
+
+Новий окремий EC2 з **Ubuntu 24.04 LTS x86_64**. Після SSH-входу як ubuntu:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git
+git clone --branch cloud-solutions-aws --single-branch https://github.com/X3Ra4/pasasa-final-project.git pasasa-bootstrap
+cd pasasa-bootstrap
+sudo bash deploy/ec2/bootstrap.sh YOUR_EC2_PUBLIC_DNS
+```
+
+Замініть адресу реальною, без http://, шляху чи порту. Початкова установка працює через HTTP для перевірки доступності; перед використанням реальних облікових записів завершіть HTTPS-крок інструкції. Скрипт не перезаписує наявну установку або БД.
+
+Оновлення:
+
+```bash
+sudo bash /opt/pasasa/deploy/ec2/update.sh
+```
+
+Медіа зберігаються у /var/lib/pasasa/media поза checkout. Оновлення зберігає БД, секрети й налаштований Nginx/TLS.
 
 ## Перевірки
 
-```powershell
-.\.venv\Scripts\python.exe manage.py check
-.\.venv\Scripts\python.exe manage.py makemigrations --check --dry-run
-.\.venv\Scripts\python.exe manage.py test --noinput
+Для локальної роботи використовується SQLite. Клонувати цю версію потрібно з --branch cloud-solutions-aws. У віртуальному середовищі з requirements.txt:
+
+```bash
+python manage.py test --noinput
+python manage.py makemigrations --check --dry-run
 ```
 
-Тести охоплюють CRUD карт і обох типів локацій, права власника й адміністратора, підміну автора, валідацію координат, захист залежних карт від видалення, пошук/фільтрацію/сортування, реєстрацію, вхід/вихід, повторне заповнення демоданих та новинний сервіс.
+Відтворювана Linux-перевірка:
 
-Додаткова браузерна перевірка та оновлення скриншотів:
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-.\.venv\Scripts\python.exe -m playwright install chromium
-# У першому терміналі:
-.\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8765
-# У другому терміналі, з тієї самої папки:
-.\.venv\Scripts\python.exe tools/browser_check.py
+```bash
+docker build -f deploy/verify/Dockerfile -t pasasa-cloud-verify:course .
+docker run --rm pasasa-cloud-verify:course
 ```
 
-Перед браузерною перевіркою потрібно виконати `migrate` та `seed_demo`. Скрипт створює тимчасового користувача й локацію, виконує реальні дії через форми, перевіряє мобільну ширину та прибирає лише власні тестові записи. За потреби `BROWSER_EXECUTABLE` може вказувати шлях до встановленого Chrome.
+Це локальний тестовий контейнер, не AWS-deploy. Він створює власну PostgreSQL і випадкові тестові секрети, перевіряє тести, міграції, Bash/ShellCheck, синтаксис systemd-unit, Gunicorn через Nginx, static/media. Реальний запуск systemd як PID 1 і автозапуск після reboot перевіряються лише на EC2.
 
-## Скриншоти
+## Демонстрація та файли
 
-Зняті з локально запущеної програми з демонстраційними даними.
+![Локальний інтерфейс PASASA](screenshots/01-maps.png)
 
-| Каталог локацій | Інтерактивна карта |
-| --- | --- |
-| ![Локації](screenshots/02-locations.png) | ![Карта](screenshots/03-interactive-map.png) |
+Скриншоти зроблено локально, не на AWS. Демодані містять 9 карт і по 6 PvP/PvE-локацій; координати вигадані.
 
-| Створення локації | Деталі та керування |
-| --- | --- |
-| ![Форма](screenshots/04-create-location.png) | ![Деталі](screenshots/05-location-detail.png) |
+- PASASA/settings_cloud.py — PostgreSQL, HTTPS, окремі static/media.
+- maps/health.py — /healthz/: 200 при доступній БД, 503 при збої без розкриття деталей.
+- deploy/ec2/ — bootstrap/update/manage, systemd, Gunicorn, Nginx та приклад .env.
+- deploy/verify/ — локальна Linux-перевірка.
+- docs/ — тема, інструкція та сценарій захисту.
 
-[Мобільний вигляд](screenshots/06-mobile.png).
-
-## Налаштування та структура
-
-Для локальної демонстрації конфігурація працює без додаткових змін. Секретний ключ генерується локально у `.local-secret` (цей файл і база даних не потрапляють у Git). Приклади змінних наведено в `.env.example`; програма читає їх із середовища, **не завантажує `.env` автоматично**.
-
-Для власного розгортання задайте `DJANGO_DEBUG=0`, випадковий `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS` і, за потреби, `DJANGO_CSRF_TRUSTED_ORIGINS`. Обслуговування static/media та HTTPS налаштовується окремо; `runserver` призначений для локальної демонстрації.
-
-- `maps/` — моделі, інтерактивні карти, каталог, форми, тести, демодані.
-- `accounts/` — користувачі, профіль, реєстрація.
-- `templates/`, `static/` — інтерфейс.
-- `media/maps/`, `media/hud/` — зображення та оформлення з початкового проєкту.
-- `docs/` — опис теми та сценарій захисту.
-- `screenshots/` — демонстрація роботи.
-
-Основний каталог працює локально. Для завантаження зовнішніх новин та їх перекладу потрібен інтернет; ці сервіси можуть бути недоступні незалежно від каталогу. Нові сторінки каталогу й документація українською; початковий інтерактивний інтерфейс має EN/RU-перемикач.
-
-ARK та ігрові зображення належать їхнім правовласникам. PASASA — навчальний фан-проєкт; включені графічні матеріали перенесено з початкової версії PASASA.
+Дизайн розрахований на один навчальний EC2. ARK та ігрові зображення належать їхнім правовласникам; це навчальний фан-проєкт.

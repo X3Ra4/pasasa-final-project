@@ -1,0 +1,5 @@
+-r requirements.txt
+gunicorn==26.2.0
+packaging==26.2
+psycopg[binary]==3.3.6
+typing_extensions==4.16.0

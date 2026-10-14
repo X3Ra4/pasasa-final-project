@@ -1,0 +1,32 @@
+[Unit]
+Description=PASASA Django application (Gunicorn)
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=pasasa
+Group=www-data
+WorkingDirectory=/opt/pasasa
+EnvironmentFile=/etc/pasasa/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/pasasa/.venv/bin/gunicorn --config /opt/pasasa/deploy/ec2/gunicorn.conf.py PASASA.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=40
+KillSignal=SIGTERM
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/pasasa
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pasasa
+
+[Install]
+WantedBy=multi-user.target
