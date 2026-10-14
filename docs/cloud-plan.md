@@ -11,8 +11,10 @@ The user authorized the branch adaptation and upload. Real EC2 access has been r
 - [x] Add pinned Linux dependencies, systemd/Nginx configs, bootstrap/update scripts and environment example.
 - [x] Test Django with PostgreSQL and Gunicorn on Linux; validate shell, systemd and Nginx configuration.
 - [x] Write Ukrainian topic, architecture, EC2 setup and evidence instructions.
-- [ ] Independent review, fixes, final checks; publish only cloud-solutions-aws.
+- [x] Independent review, fixes, final checks; publish only cloud-solutions-aws.
 
 Review focus: missing secrets must fail startup; HTTP/HTTPS must behave as documented; migrations and uploaded media survive code updates; PostgreSQL/Gunicorn never bind publicly; scripts must not overwrite an existing unrelated deployment.
 
 Independent review found no critical/important blockers. Incorporated its deployment-order improvement: stop Gunicorn before changing the checkout or dependencies, accepting maintenance downtime to avoid mixed-version requests. Real AWS/systemd boot/TLS verification remains explicitly pending EC2 access.
+
+Published cloud-solutions-aws to origin and verified its remote commit. Main remains at 40b13679b2455aee83e998f00bf2dc99d314f6bc. Validation: 23 tests on SQLite and PostgreSQL, successful Linux/Gunicorn/Nginx checks; see CLOUD_VERIFICATION.md.
