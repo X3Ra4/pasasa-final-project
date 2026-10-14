@@ -1,0 +1,43 @@
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+<div class="account-avatar-widget">
+    <div class="account-avatar-current">
+        <span class="account-avatar-current-label">
+            {% if CURRENT_LANGUAGE == 'ru' %}На данный момент:{% else %}At the moment:{% endif %}
+        </span>
+        <span class="account-avatar-current-value">
+            {% if widget.is_initial %}
+                {% if CURRENT_LANGUAGE == 'ru' %}Есть фото{% else %}Photo exists{% endif %}
+            {% else %}
+                {% if CURRENT_LANGUAGE == 'ru' %}Нет фото{% else %}No photo{% endif %}
+            {% endif %}
+        </span>
+        {% if widget.is_initial and not widget.required %}
+            <label for="{{ widget.checkbox_id }}" class="account-checkbox account-checkbox--avatar">
+                <input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}">
+                <span class="account-checkbox-mark" aria-hidden="true"></span>
+                <span class="account-checkbox-text">
+                    {% if CURRENT_LANGUAGE == 'ru' %}Очистить{% else %}Clear{% endif %}
+                </span>
+            </label>
+        {% endif %}
+    </div>
+
+    <div class="account-avatar-change">
+        <span class="account-avatar-change-label">
+            {% if CURRENT_LANGUAGE == 'ru' %}Изменить:{% else %}Change:{% endif %}
+        </span>
+        <input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+        <label for="{{ widget.attrs.id }}" class="account-upload-trigger">
+            {% if CURRENT_LANGUAGE == 'ru' %}Выбрать фото{% else %}Choose image{% endif %}
+        </label>
+    </div>
+
+    <p class="account-upload-hint">
+        {% if CURRENT_LANGUAGE == 'ru' %}
+            JPG, PNG или WEBP. Изменения применятся после сохранения профиля.
+        {% else %}
+            JPG, PNG or WEBP. Changes will apply after saving the profile.
+        {% endif %}
+    </p>
+</div>

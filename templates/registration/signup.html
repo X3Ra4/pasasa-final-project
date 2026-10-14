@@ -1,0 +1,2 @@
+{% extends 'catalog/base.html' %}
+{% block catalog_content %}<section class="panel auth-panel"><p class="eyebrow">PASASA / ПРИЄДНУЙСЯ</p><h1>Реєстрація</h1><form method="post" class="editor">{% csrf_token %}{{ form.as_p }}<button class="button" type="submit">Створити акаунт</button></form><p>Уже є акаунт? <a href="{% url 'login' %}">Увійти</a></p></section>{% endblock %}

@@ -1,0 +1,2 @@
+{% extends 'catalog/base.html' %}
+{% block catalog_content %}<section class="panel"><h1>Видалити «{{ obj.name }}»?</h1><p>Цю дію неможливо скасувати. Пов’язані оцінки та записи медіа також буде видалено.</p>{% if error %}<p class="errorlist" role="alert">{{ error }}</p>{% endif %}<form method="post">{% csrf_token %}<div class="actions"><button class="button danger" type="submit">Підтвердити видалення</button><a href="{% url 'catalog:detail' kind=kind pk=obj.pk %}">Скасувати</a></div></form></section>{% endblock %}

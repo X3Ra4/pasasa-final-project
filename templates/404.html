@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}PASASA | 404{% endblock %}
+
+{% block content %}
+<section class="not-found-wrap">
+    <div class="not-found-card panel">
+        <p class="not-found-code">404</p>
+        <h1>{% if LANGUAGE_CODE == 'ru' %}Страница не найдена{% else %}Page not found{% endif %}</h1>
+        <p class="not-found-text">
+            {% if LANGUAGE_CODE == 'ru' %}
+            Такой страницы нет или ссылка устарела.
+            {% else %}
+            This page does not exist or the link is outdated.
+            {% endif %}
+        </p>
+        <a href="{% url 'maps:maps_home' mode='PVP' %}" class="btn btn-primary">
+            {% if LANGUAGE_CODE == 'ru' %}На главную{% else %}Go to home{% endif %}
+        </a>
+    </div>
+</section>
+{% endblock %}

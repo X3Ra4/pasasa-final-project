@@ -1,0 +1,6 @@
+{% extends 'catalog/base.html' %}
+{% block catalog_content %}
+<a href="{% url 'catalog:list' kind=kind %}">← {{ catalog_title }}</a>
+<h1>{% if obj %}Редагувати: {{ obj.name }}{% else %}Додати запис · {{ catalog_title }}{% endif %}</h1>
+<form method="post" enctype="multipart/form-data" class="editor panel">{% csrf_token %}{{ form.as_p }}<div class="actions"><button class="button" type="submit">Зберегти</button><a href="{% url 'catalog:list' kind=kind %}">Скасувати</a></div></form>
+{% endblock %}

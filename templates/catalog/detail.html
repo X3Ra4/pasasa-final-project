@@ -1,0 +1,16 @@
+{% extends 'catalog/base.html' %}
+{% block catalog_content %}
+<a href="{% url 'catalog:list' kind=kind %}">← {{ catalog_title }}</a>
+<div class="catalog-heading"><div><p class="eyebrow">{{ catalog_title }}</p><h1>{{ obj.name }}</h1></div>{% if can_edit %}<div class="actions"><a class="button" href="{% url 'catalog:edit' kind=kind pk=obj.pk %}">Редагувати</a><a class="button danger" href="{% url 'catalog:delete' kind=kind pk=obj.pk %}">Видалити</a></div>{% endif %}</div>
+{% if kind == 'maps' %}
+  {% if obj.head_img %}<img class="detail-cover" src="{{ obj.head_img.url }}" alt="{{ obj.name }}">{% endif %}
+  <div class="actions"><a class="button" href="{% url 'maps:map_detail' mode='PVP' map_slug=obj.slug %}">Інтерактивна карта PvP</a><a class="button secondary" href="{% url 'maps:map_detail' mode='PVE' map_slug=obj.slug %}">Інтерактивна карта PvE</a></div>
+  <section class="panel"><h2>PvP-локації</h2>{% for spot in spots %}<p><a href="{% url 'catalog:detail' kind='spots' pk=spot.pk %}">{{ spot.name }}</a></p>{% empty %}<p>Локацій ще немає.</p>{% endfor %}<h2>PvE-локації</h2>{% for place in places %}<p><a href="{% url 'catalog:detail' kind='places' pk=place.pk %}">{{ place.name }}</a></p>{% empty %}<p>Локацій ще немає.</p>{% endfor %}</section>
+{% else %}
+  <section class="panel"><dl class="facts"><dt>Карта</dt><dd>{% if obj.map_location %}<a href="{% url 'catalog:detail' kind='maps' pk=obj.map_location.pk %}">{{ obj.map_location.name }}</a>{% else %}—{% endif %}</dd><dt>Координати</dt><dd>{{ obj.coordsx }} / {{ obj.coordsy }}</dd><dt>Тип</dt><dd>{{ obj.type|default:'—' }}</dd><dt>Оцінка локації</dt><dd>{{ location_rating|default_if_none:'—' }} / 5</dd><dt>Оцінка гравців</dt><dd>{{ obj.user_rating }} / 5</dd><dt>Автор</dt><dd>{{ obj.player|default:'Демонстраційна локація' }}</dd>
+  {% if kind == 'spots' %}<dt>Розташування</dt><dd>{{ obj.sl }}</dd><dt>Динозавр для рейду</dt><dd>{{ obj.best_dino_for_raid }}</dd><dt>Входи</dt><dd>{{ obj.exit_qntt }}</dd>{% else %}<dt>Ресурси</dt><dd>{{ obj.resources|default_if_none:'—' }} / 5</dd>{% endif %}
+  <dt>Особливості</dt><dd>{% for feature in features %}{{ feature.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd></dl>
+  {% if obj.map_location %}<a class="button" href="{% url 'maps:map_detail' mode=mode map_slug=obj.map_location.slug %}">Відкрити карту · оцінки та обране</a>{% endif %}</section>
+  {% for item in media_items %}<figure class="panel">{% if item.media_type == 'image' %}<img class="detail-cover" src="{{ item.file.url }}" alt="{{ item.title }}">{% else %}<video class="detail-cover" controls src="{{ item.file.url }}"></video>{% endif %}<figcaption>{{ item.title }}</figcaption></figure>{% endfor %}
+{% endif %}
+{% endblock %}

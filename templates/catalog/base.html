@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ catalog_title|default:'Кабінет' }} · PASASA{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/catalog.css' %}">{% endblock %}
+{% block content %}
+<div class="catalog-shell" lang="uk">
+  <nav class="catalog-nav" aria-label="Каталог">
+    <a href="{% url 'catalog:list' kind='maps' %}" {% if kind == 'maps' %}aria-current="page"{% endif %}>Карти</a>
+    <a href="{% url 'catalog:list' kind='spots' %}" {% if kind == 'spots' %}aria-current="page"{% endif %}>PvP-локації</a>
+    <a href="{% url 'catalog:list' kind='places' %}" {% if kind == 'places' %}aria-current="page"{% endif %}>PvE-локації</a>
+    {% if request.user.is_staff %}<a href="{% url 'admin:index' %}">Адміністрування</a>{% endif %}
+  </nav>
+  {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  {% block catalog_content %}{% endblock %}
+</div>
+{% endblock %}

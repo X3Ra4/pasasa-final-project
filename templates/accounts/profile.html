@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+
+{% block title %}PASASA | {% if LANGUAGE_CODE == 'ru' %}Аккаунт{% else %}Account{% endif %}{% endblock %}
+{% block body_class %}page-account{% endblock %}
+
+{% block content %}
+<section class="account-page">
+    <div class="account-layout">
+        <section class="panel account-panel favorites-panel">
+            <div class="account-panel-head">
+                <div>
+                    <h1>{% if LANGUAGE_CODE == 'ru' %}Избранные места и споты{% else %}Favorite places and spots{% endif %}</h1>
+                </div>
+                <span class="account-count">{{ favorite_items|length }}</span>
+            </div>
+
+            {% if favorite_items %}
+                <div class="favorites-grid">
+                    {% for item in favorite_items %}
+                        <article class="favorite-card">
+                            <div class="favorite-card-media">
+                                {% if item.media_url %}
+                                    <img src="{{ item.media_url }}" alt="{{ item.title }}">
+                                {% else %}
+                                    <div class="favorite-card-fallback">
+                                        {% if LANGUAGE_CODE == 'ru' %}Нет медиа{% else %}No media{% endif %}
+                                    </div>
+                                {% endif %}
+                                <span class="favorite-kind">{{ item.kind }}</span>
+                            </div>
+                            <div class="favorite-card-body">
+                                <h2>{{ item.title }}</h2>
+                                <div class="favorite-meta">
+                                    <span>{{ item.map_name }}</span>
+                                    <span>{{ item.coords }}</span>
+                                </div>
+                                <div class="favorite-stats">
+                                    <span>{{ item.type_name }}</span>
+                                    <span>{% if LANGUAGE_CODE == 'ru' %}Рейтинг{% else %}Rating{% endif %}: {{ item.rating|default:"-" }}</span>
+                                    <span>{% if LANGUAGE_CODE == 'ru' %}Лайки{% else %}Likes{% endif %}: {{ item.likes_count }}</span>
+                                </div>
+                                {% if item.detail_url %}
+                                    <a class="favorite-link" href="{{ item.detail_url }}">
+                                        {% if LANGUAGE_CODE == 'ru' %}Открыть карту{% else %}Open map{% endif %}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="account-empty">
+                    {% if LANGUAGE_CODE == 'ru' %}Пока нет избранных спотов. Лайкните точку на карте, и она появится здесь.{% else %}No favorite spots yet. Like a spot on the map and it will appear here.{% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="account-main-column">
+            <div class="account-tab-switch tab-switch" data-account-tabs>
+                <button
+                    type="button"
+                    class="account-tab-btn tab-btn {% if active_tab != 'settings' %}is-active{% endif %}"
+                    data-account-tab-trigger="account"
+                    data-account-tab-title="{% if LANGUAGE_CODE == 'ru' %}Аккаунт{% else %}Account{% endif %}">
+                    {% if LANGUAGE_CODE == 'ru' %}Аккаунт{% else %}Account{% endif %}
+                </button>
+                <button
+                    type="button"
+                    class="account-tab-btn tab-btn {% if active_tab == 'settings' %}is-active{% endif %}"
+                    data-account-tab-trigger="settings"
+                    data-account-tab-title="{% if LANGUAGE_CODE == 'ru' %}Настройки{% else %}Settings{% endif %}">
+                    {% if LANGUAGE_CODE == 'ru' %}Настройки{% else %}Settings{% endif %}
+                </button>
+            </div>
+
+            <section class="panel account-panel account-main-panel">
+                <div class="account-panel-head account-main-head">
+                    <div>
+                        <h2 data-account-panel-title>
+                            {% if active_tab == 'settings' %}
+                                {% if LANGUAGE_CODE == 'ru' %}Настройки{% else %}Settings{% endif %}
+                            {% else %}
+                                {% if LANGUAGE_CODE == 'ru' %}Аккаунт{% else %}Account{% endif %}
+                            {% endif %}
+                        </h2>
+                    </div>
+                </div>
+
+                {% if messages %}
+                    <div class="account-messages">
+                        {% for message in messages %}
+                            <div class="account-message {{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="account-tab-panel {% if active_tab != 'settings' %}is-active{% endif %}" data-account-tab-panel="account">
+                    <div class="account-profile-hero">
+                        <div class="account-avatar-shell">
+                            {% if request.user.avatar %}
+                                <img src="{{ request.user.avatar.url }}" alt="{{ request.user.username }}" class="account-avatar-image">
+                            {% else %}
+                                <div class="account-avatar-fallback">{{ request.user.username|slice:":1"|upper }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="account-profile-summary">
+                            <h3>{{ request.user.username }}</h3>
+                            <div class="account-summary-row">
+                                <span class="account-status-badge">{{ request.user.status|default:"Free" }}</span>
+                                <span>{% if LANGUAGE_CODE == 'ru' %}С нами с{% else %}With us since{% endif %} {{ request.user.date_joined|date:"d.m.Y" }}</span>
+                            </div>
+                            <p>
+                                {% if request.user.bio %}
+                                    {{ request.user.bio }}
+                                {% else %}
+                                    {% if LANGUAGE_CODE == 'ru' %}Биография пока не заполнена.{% else %}Bio is not filled yet.{% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="account-data-grid">
+                        <div class="account-data-card">
+                            <span>{% if LANGUAGE_CODE == 'ru' %}Имя{% else %}First name{% endif %}</span>
+                            <strong>{{ request.user.first_name|default:"-" }}</strong>
+                        </div>
+                        <div class="account-data-card">
+                            <span>{% if LANGUAGE_CODE == 'ru' %}Фамилия{% else %}Last name{% endif %}</span>
+                            <strong>{{ request.user.last_name|default:"-" }}</strong>
+                        </div>
+                        <div class="account-data-card">
+                            <span>Email</span>
+                            <strong>{{ request.user.email|default:"-" }}</strong>
+                        </div>
+                        <div class="account-data-card">
+                            <span>{% if LANGUAGE_CODE == 'ru' %}Последний вход{% else %}Last login{% endif %}</span>
+                            <strong>{{ request.user.last_login|date:"d.m.Y H:i"|default:"-" }}</strong>
+                        </div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" class="account-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="profile">
+
+                        <div class="account-form-grid">
+                            <label class="account-field">
+                                <span>Username</span>
+                                {{ profile_form.username }}
+                                {% for error in profile_form.username.errors %}<small class="account-field-error">{{ error }}</small>{% endfor %}
+                            </label>
+                            <label class="account-field">
+                                <span>{% if LANGUAGE_CODE == 'ru' %}Имя{% else %}First name{% endif %}</span>
+                                {{ profile_form.first_name }}
+                                {% for error in profile_form.first_name.errors %}<small class="account-field-error">{{ error }}</small>{% endfor %}
+                            </label>
+                            <label class="account-field">
+                                <span>{% if LANGUAGE_CODE == 'ru' %}Фамилия{% else %}Last name{% endif %}</span>
+                                {{ profile_form.last_name }}
+                                {% for error in profile_form.last_name.errors %}<small class="account-field-error">{{ error }}</small>{% endfor %}
+                            </label>
+                            <label class="account-field">
+                                <span>Email</span>
+                                {{ profile_form.email }}
+                                {% for error in profile_form.email.errors %}<small class="account-field-error">{{ error }}</small>{% endfor %}
+                            </label>
+                            <div class="account-field account-field--full">
+                                <span>{% if LANGUAGE_CODE == 'ru' %}Аватар{% else %}Avatar{% endif %}</span>
+                                <div class="account-avatar-upload">
+                                    {{ profile_form.avatar }}
+                                    <label for="{{ profile_form.avatar.id_for_label }}" class="account-upload-trigger">
+                                        {% if LANGUAGE_CODE == 'ru' %}Выбрать фото{% else %}Choose image{% endif %}
+                                    </label>
+                                    <p class="account-upload-hint">
+                                        {% if LANGUAGE_CODE == 'ru' %}
+                                            JPG, PNG или WEBP. Изменения применятся после сохранения профиля.
+                                        {% else %}
+                                            JPG, PNG or WEBP. Changes will apply after saving the profile.
+                                        {% endif %}
+                                    </p>
+                                    {% if profile_form.instance.avatar %}
+                                        <label for="{{ profile_form.avatar.clear_checkbox_id }}" class="account-checkbox">
+                                            <input
+                                                type="checkbox"
+                                                name="{{ profile_form.avatar.clear_checkbox_name }}"
+                                                id="{{ profile_form.avatar.clear_checkbox_id }}">
+                                            <span class="account-checkbox-mark" aria-hidden="true"></span>
+                                            <span class="account-checkbox-text">
+                                                {% if LANGUAGE_CODE == 'ru' %}Очистить{% else %}Clear{% endif %}
+                                            </span>
+                                        </label>
+                                    {% endif %}
+                                </div>
+                                {% for error in profile_form.avatar.errors %}<small class="account-field-error">{{ error }}</small>{% endfor %}
+                            </div>
+                            <label class="account-field account-field--full">
+                                <span>Bio</span>
+                                {{ profile_form.bio }}
+                                {% for error in profile_form.bio.errors %}<small class="account-field-error">{{ error }}</small>{% endfor %}
+                            </label>
+                        </div>
+
+                        <div class="account-readonly-grid">
+                            <div class="account-readonly-card">
+                                <span>{% if LANGUAGE_CODE == 'ru' %}Статус подписки{% else %}Subscription status{% endif %}</span>
+                                <strong>{{ request.user.status|default:"Free" }}</strong>
+                            </div>
+                            <div class="account-readonly-card">
+                                <span>{% if LANGUAGE_CODE == 'ru' %}Пароль{% else %}Password{% endif %}</span>
+                                <strong>••••••••</strong>
+                            </div>
+                        </div>
+
+                        {% if profile_form.non_field_errors %}
+                            <div class="account-form-errors">
+                                {% for error in profile_form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <button type="submit" class="btn btn-primary">
+                            {% if LANGUAGE_CODE == 'ru' %}Сохранить изменения{% else %}Save changes{% endif %}
+                        </button>
+                    </form>
+                </div>
+
+                <div class="account-tab-panel settings-tab-panel {% if active_tab == 'settings' %}is-active{% endif %}" data-account-tab-panel="settings">
+                    <div class="settings-grid">
+                        <section class="settings-card">
+                            <div class="settings-card-head">
+                                <h3>{% if LANGUAGE_CODE == 'ru' %}Смена пароля{% else %}Password{% endif %}</h3>
+                                <span>••••••••</span>
+                            </div>
+                            <form method="post" class="account-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="password">
+
+                                <div class="account-form-grid">
+                                    <label class="account-field account-field--full">
+                                        <span>{% if LANGUAGE_CODE == 'ru' %}Текущий пароль{% else %}Current password{% endif %}</span>
+                                        {{ password_form.old_password }}
+                                        {% for error in password_form.old_password.errors %}<small class="account-field-error">{{ error }}</small>{% endfor %}
+                                    </label>
+                                    <label class="account-field">
+                                        <span>{% if LANGUAGE_CODE == 'ru' %}Новый пароль{% else %}New password{% endif %}</span>
+                                        {{ password_form.new_password1 }}
+                                        {% for error in password_form.new_password1.errors %}<small class="account-field-error">{{ error }}</small>{% endfor %}
+                                    </label>
+                                    <label class="account-field">
+                                        <span>{% if LANGUAGE_CODE == 'ru' %}Повторите пароль{% else %}Repeat password{% endif %}</span>
+                                        {{ password_form.new_password2 }}
+                                        {% for error in password_form.new_password2.errors %}<small class="account-field-error">{{ error }}</small>{% endfor %}
+                                    </label>
+                                </div>
+
+                                {% if password_form.non_field_errors %}
+                                    <div class="account-form-errors">
+                                        {% for error in password_form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                <button type="submit" class="btn btn-primary">
+                                    {% if LANGUAGE_CODE == 'ru' %}Обновить пароль{% else %}Update password{% endif %}
+                                </button>
+                            </form>
+                        </section>
+
+                        <section class="settings-card">
+                            <div class="settings-card-head">
+                                <h3>{% if LANGUAGE_CODE == 'ru' %}Подписка{% else %}Subscription{% endif %}</h3>
+                                <span>{{ request.user.status|default:"Free" }}</span>
+                            </div>
+                            <div class="subscription-placeholder">
+                                <p>{% if LANGUAGE_CODE == 'ru' %}Управление подпиской будет добавлено позже. Пока это заглушка блока премиум-доступа.{% else %}Subscription management will be added later. This is a placeholder for premium access controls.{% endif %}</p>
+                                <div class="subscription-mock">
+                                    <span>{% if LANGUAGE_CODE == 'ru' %}Текущий план{% else %}Current plan{% endif %}</span>
+                                    <strong>{{ request.user.status|default:"Free" }}</strong>
+                                </div>
+                                <button type="button" class="btn subscription-btn" disabled>
+                                    {% if LANGUAGE_CODE == 'ru' %}Скоро доступно{% else %}Coming soon{% endif %}
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section class="panel account-panel news-panel">
+            <div class="account-panel-head">
+                <div>
+                    <h2>{% if LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}</h2>
+                </div>
+            </div>
+            <div class="account-empty news-empty">
+                {% if LANGUAGE_CODE == 'ru' %}Новости появятся здесь позже.{% else %}News will appear here later.{% endif %}
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const root = document.querySelector("[data-account-tabs]");
+    if (root) {
+        const buttons = Array.from(root.querySelectorAll("[data-account-tab-trigger]"));
+        const panels = Array.from(document.querySelectorAll("[data-account-tab-panel]"));
+        const panelTitle = document.querySelector("[data-account-panel-title]");
+
+        const activate = (tabName) => {
+            buttons.forEach((button) => {
+                button.classList.toggle("is-active", button.dataset.accountTabTrigger === tabName);
+            });
+            panels.forEach((panel) => {
+                panel.classList.toggle("is-active", panel.dataset.accountTabPanel === tabName);
+            });
+            const activeButton = buttons.find((button) => button.dataset.accountTabTrigger === tabName);
+            if (panelTitle && activeButton) {
+                panelTitle.textContent = activeButton.dataset.accountTabTitle || activeButton.textContent.trim();
+            }
+        };
+
+        buttons.forEach((button) => {
+            button.addEventListener("click", () => activate(button.dataset.accountTabTrigger));
+        });
+    }
+
+    const newsContainer = document.querySelector(".news-panel .account-empty");
+    if (!newsContainer) return;
+
+    const pageLang = "{{ LANGUAGE_CODE|default:'ru' }}".toLowerCase().startsWith("ru") ? "ru" : "en";
+    const labels = {
+        ru: {
+            loading: "Загрузка новостей...",
+            empty: "Новостей пока нет.",
+            error: "Не удалось загрузить новости.",
+            open: "Подробнее",
+        },
+        en: {
+            loading: "Loading news...",
+            empty: "No news yet.",
+            error: "Failed to load news.",
+            open: "Read more",
+        },
+    };
+
+    const t = labels[pageLang];
+    newsContainer.textContent = t.loading;
+
+    const escapeHtml = (value) => String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    const formatDate = (value) => {
+        if (!value) return "";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        return new Intl.DateTimeFormat(pageLang === "ru" ? "ru-RU" : "en-US", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        }).format(date);
+    };
+
+    fetch(`/api/news/?lang=${encodeURIComponent(pageLang)}`, {
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((payload) => {
+            const items = (Array.isArray(payload.items) ? payload.items : []).slice(0, 4);
+            if (!items.length) {
+                newsContainer.textContent = t.empty;
+                return;
+            }
+
+            newsContainer.classList.add("news-feed");
+            newsContainer.innerHTML = items.map((item) => `
+                <article class="news-card">
+                    <div class="news-card-body">
+                        <div class="news-card-meta">
+                            <span>${escapeHtml(payload.source || "steam")}</span>
+                            ${item.published_at ? `<span>${escapeHtml(formatDate(item.published_at))}</span>` : ""}
+                        </div>
+                        <h3 class="news-card-title">${escapeHtml(item.title)}</h3>
+                        <p class="news-card-text">${escapeHtml(item.description || "")}</p>
+                        <a class="news-card-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${t.open}</a>
+                    </div>
+                </article>
+            `).join("");
+        })
+        .catch(() => {
+            newsContainer.textContent = t.error;
+        });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'catalog/base.html' %}
+{% block catalog_content %}
+<div class="catalog-heading"><div><p class="eyebrow">PASASA / ДОСЛІДЖУЙ ARK</p><h1>{{ catalog_title }}</h1><p class="muted">Знайди місце для наступної пригоди.</p></div>{% if can_create %}<a class="button" href="{% url 'catalog:create' kind=kind %}">+ Додати</a>{% elif not request.user.is_authenticated %}<a class="button secondary" href="{% url 'login' %}">Увійти</a>{% endif %}</div>
+<form method="get" class="catalog-filters">
+  <label>Пошук<input type="search" name="q" value="{{ query }}" placeholder="Назва або адреса…"></label>
+  {% if kind != 'maps' %}<label>Карта<select name="map"><option value="">Усі карти</option>{% for map in maps %}<option value="{{ map.pk }}" {% if selected_map == map.pk|stringformat:'s' %}selected{% endif %}>{{ map.name }}</option>{% endfor %}</select></label>{% endif %}
+  <label>Сортування<select name="sort"><option value="name" {% if sort == 'name' %}selected{% endif %}>Назва: А → Я</option><option value="-name" {% if sort == '-name' %}selected{% endif %}>Назва: Я → А</option><option value="-id" {% if sort == '-id' %}selected{% endif %}>Спочатку нові</option></select></label>
+  <button class="button" type="submit">Знайти</button><a href="{% url 'catalog:list' kind=kind %}">Скинути</a>
+</form>
+<p class="muted">Знайдено: {{ page_obj.paginator.count }}</p>
+<div class="catalog-grid">
+{% for obj in page_obj %}<article class="catalog-card">
+  {% if kind == 'maps' and obj.head_img %}<img class="card-cover" src="{{ obj.head_img.url }}" alt="{{ obj.name }}" loading="lazy">{% elif obj.map_location.head_img %}<img class="card-cover" src="{{ obj.map_location.head_img.url }}" alt="{{ obj.map_location.name }}" loading="lazy">{% endif %}
+  <div class="card-body"><p class="eyebrow">{% if kind == 'maps' %}КАРТА ARK{% else %}{{ obj.map_location.name }}{% endif %}</p><h2><a href="{% url 'catalog:detail' kind=kind pk=obj.pk %}">{{ obj.name }}</a></h2>
+  {% if kind != 'maps' %}<p class="muted">Координати: {{ obj.coordsx }} / {{ obj.coordsy }}</p><p>Оцінка гравців: {{ obj.user_rating }} / 5</p>{% endif %}
+  <a class="card-link" href="{% url 'catalog:detail' kind=kind pk=obj.pk %}">Переглянути →</a></div>
+</article>{% empty %}<div class="empty-state"><h2>Нічого не знайдено</h2><p>Спробуй інший запит або додай нову локацію.</p></div>{% endfor %}
+</div>
+{% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Сторінки">{% if page_obj.has_previous %}<a href="?{{ query_string }}&amp;page={{ page_obj.previous_page_number }}">← Назад</a>{% endif %}<span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?{{ query_string }}&amp;page={{ page_obj.next_page_number }}">Далі →</a>{% endif %}</nav>{% endif %}
+{% endblock %}

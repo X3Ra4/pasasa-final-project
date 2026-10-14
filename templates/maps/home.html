@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}PASASA | {{ current_mode }} {% if LANGUAGE_CODE == 'ru' %}Карты{% else %}Maps{% endif %}{% endblock %}
+
+{% block content %}
+<section class="home-page">
+    <div class="home-intro panel">
+        <h1>{{ current_mode }} MAPS</h1>
+    </div>
+
+    <section class="maps-grid" aria-label="{% if LANGUAGE_CODE == 'ru' %}Выбор карты{% else %}Map selector{% endif %}">
+        {% for map in maps %}
+        <a class="map-card-link" href="{% url 'maps:map_detail' mode=current_mode map_slug=map.obj.slug %}">
+            <article class="map-card panel">
+                <div class="map-preview map-preview-db" aria-hidden="true">
+                    {% if map.obj.head_img %}
+                    <img src="{{ map.obj.head_img.url }}" alt="{{ map.display_name }}">
+                    {% elif map.obj.map_img %}
+                    <img src="{{ map.obj.map_img.url }}" alt="{{ map.display_name }}">
+                    {% else %}
+                    <div class="map-preview-fallback">{% if LANGUAGE_CODE == 'ru' %}Нет изображения{% else %}No image{% endif %}</div>
+                    {% endif %}
+                </div>
+                <h2>{{ map.display_name }}</h2>
+                <div class="map-card-stats">
+                    <p>
+                        {% if LANGUAGE_CODE|slice:":2" == 'ru' %}
+                        Средний рейтинг: {{ map.avg_spot_rating }}
+                        {% else %}
+                        Average rating: {{ map.avg_spot_rating }}
+                        {% endif %}
+                    </p>
+                    <p>
+                        {% if LANGUAGE_CODE|slice:":2" == 'ru' %}
+                            {% if current_mode == 'PVE' %}
+                            Количество мест: {{ map.total_spots }}
+                            {% else %}
+                            Количество спотов: {{ map.total_spots }}
+                            {% endif %}
+                        {% else %}
+                            {% if current_mode == 'PVE' %}
+                            Total places: {{ map.total_spots }}
+                            {% else %}
+                            Total spots: {{ map.total_spots }}
+                            {% endif %}
+                        {% endif %}
+                    </p>
+                </div>
+            </article>
+        </a>
+        {% empty %}
+        <article class="map-card panel">
+            <h2>{% if LANGUAGE_CODE == 'ru' %}Карт пока нет{% else %}No maps yet{% endif %}</h2>
+        </article>
+        {% endfor %}
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+.local-secret
+media/users/
+media/spots/
+media/places/
+staticfiles/
+.work/
+*.log
+.DS_Store

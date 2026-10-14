@@ -1,0 +1,226 @@
+﻿{% extends "base.html" %}
+{% load static l10n %}
+
+{% block title %}PASASA | {{ current_mode }} {{ map_display_name }}{% endblock %}
+{% block body_class %}page-map-detail{% endblock %}
+
+{% block content %}
+<section class="map-detail-page">
+    <div class="layout-detail">
+        <section class="left-column panel">
+            <div class="map-toolbar">
+                <h1>{{ map_display_name }}</h1>
+                <div class="zoom-controls" role="group" aria-label="{% if LANGUAGE_CODE == 'ru' %}Управление масштабом{% else %}Map zoom controls{% endif %}">
+                    <button type="button" class="zoom-btn" data-zoom-action="out">-</button>
+                    <button type="button" class="zoom-btn" data-zoom-action="in">+</button>
+                </div>
+            </div>
+
+            <div class="map-frame">
+                <div class="map-canvas" data-map-canvas>
+                    {% if map_obj.map_img %}
+                    <img class="detail-map-image" src="{{ map_obj.map_img.url }}" alt="{{ map_display_name }}">
+                    {% endif %}
+                    <div class="map-overlay" data-map-overlay>
+                        {% for spot in spots %}
+                        <button class="pin is-visible" type="button"
+                                data-pin-id="{{ spot.slug }}"
+                                data-type1="{{ spot.type.slug }}"
+                                data-type2="{% if current_mode == 'PVE' %}all{% else %}{{ spot.sl.slug }}{% endif %}"
+                                data-size="{% if current_mode == 'PVE' %}all{% else %}{{ spot.best_dino_for_raid.slug }}{% endif %}"
+                                data-entrance="{% if current_mode == 'PVE' %}res-{{ spot.resources }}{% else %}{{ spot.exit_qntt.slug }}{% endif %}"
+                                data-admin-rating="{% if current_mode == 'PVE' %}{{ spot.rating }}{% else %}{{ spot.raiting }}{% endif %}"
+                                data-user-rating="{{ spot.user_rating|unlocalize }}"
+                                data-features="{% for feature in spot.spotfeature.all %}{{ feature.slug }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                                style="top: {{ spot.coordsx|unlocalize }}%; left: {{ spot.coordsy|unlocalize }}%;"
+                                aria-label="{{ spot.name }}">
+                            <img class="pin-marker" src="{% static 'icons/icon-pasasa.svg' %}" alt="" aria-hidden="true">
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="coords-label">
+                    {% if LANGUAGE_CODE == 'ru' %}Коорд:{% else %}Coords:{% endif %}
+                    {% if spots %}
+                    {{ spots.0.coordsy }} / {{ spots.0.coordsx }}
+                    {% else %}
+                    0.0 / 0.0
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <section class="center-column">
+            <div class="tab-switch" data-tab-switch>
+                <button class="tab-btn is-active" type="button" data-tab-target="filter">{% if LANGUAGE_CODE == 'ru' %}Фильтр{% else %}Filter{% endif %}</button>
+                <button class="tab-btn" type="button" data-tab-target="description">{% if LANGUAGE_CODE == 'ru' %}Описание{% else %}Description{% endif %}</button>
+            </div>
+
+            <article class="tab-panel panel is-active" data-tab-panel="filter">
+                <h2>
+                    {% if current_mode == 'PVE' %}
+                        {% if LANGUAGE_CODE == 'ru' %}Фильтры мест{% else %}Place Filters{% endif %}
+                    {% else %}
+                        {% if LANGUAGE_CODE == 'ru' %}Фильтры спотов{% else %}Spot Filters{% endif %}
+                    {% endif %}
+                </h2>
+                <div class="filter-grid">
+                    <label>
+                        <span>{% if LANGUAGE_CODE == 'ru' %}Тип места{% else %}Type{% endif %}</span>
+                        <select data-filter="type1">
+                            <option value="all">{% if LANGUAGE_CODE == 'ru' %}Все{% else %}All{% endif %}</option>
+                            {% for item in type_options %}
+                            <option value="{{ item.slug }}">{{ item.display_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    {% if current_mode != 'PVE' %}
+                    <label>
+                        <span>{% if LANGUAGE_CODE == 'ru' %}Тип места{% else %}Type spot{% endif %}</span>
+                        <select data-filter="type2">
+                            <option value="all">{% if LANGUAGE_CODE == 'ru' %}Все{% else %}All{% endif %}</option>
+                            {% for item in sl_options %}
+                            <option value="{{ item.slug }}">{{ item.display_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <label>
+                        <span>{% if LANGUAGE_CODE == 'ru' %}Лучший дино для рейда{% else %}Best dino for raid{% endif %}</span>
+                        <select data-filter="size">
+                            <option value="all">{% if LANGUAGE_CODE == 'ru' %}Все{% else %}All{% endif %}</option>
+                            {% for item in best_dino_for_raid_options %}
+                            <option value="{{ item.slug }}">{{ item.dino }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    {% endif %}
+
+                    <label>
+                        <span>
+                            {% if current_mode == 'PVE' %}
+                                {% if LANGUAGE_CODE == 'ru' %}Ресурсы{% else %}Resources{% endif %}
+                            {% else %}
+                                {% if LANGUAGE_CODE == 'ru' %}Количество выходов{% else %}Exit Quantity{% endif %}
+                            {% endif %}
+                        </span>
+                        <select data-filter="entrance">
+                            <option value="all">{% if LANGUAGE_CODE == 'ru' %}Все{% else %}All{% endif %}</option>
+                            {% for item in exit_options %}
+                            <option value="{{ item.slug }}">{{ item.quantity }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+
+                <fieldset class="feature-group">
+                    <legend>
+                        {% if current_mode == 'PVE' %}
+                            {% if LANGUAGE_CODE == 'ru' %}Особенности места{% else %}Place Features{% endif %}
+                        {% else %}
+                            {% if LANGUAGE_CODE == 'ru' %}Фишки места{% else %}Spot Features{% endif %}
+                        {% endif %}
+                    </legend>
+                    {% for item in feature_options %}
+                    <label><input type="checkbox" data-feature="{{ item.slug }}"> {{ item.display_name }}</label>
+                    {% empty %}
+                    <label>{% if LANGUAGE_CODE == 'ru' %}Нет фишек{% else %}No features{% endif %}</label>
+                    {% endfor %}
+                </fieldset>
+
+                <section class="rating-block">
+                    <h3>{% if LANGUAGE_CODE == 'ru' %}Рейтинг пользователей{% else %}Users Priority Rating{% endif %}</h3>
+                    <div class="rating-controls">
+                        <div class="star-row" data-user-filter-stars>
+                            <button type="button" class="star" data-star-value="1">&#9733;</button>
+                            <button type="button" class="star" data-star-value="2">&#9733;</button>
+                            <button type="button" class="star" data-star-value="3">&#9733;</button>
+                            <button type="button" class="star" data-star-value="4">&#9733;</button>
+                            <button type="button" class="star" data-star-value="5">&#9733;</button>
+                        </div>
+                        <button type="button" class="rating-reset-btn" data-user-rating-reset>{% if LANGUAGE_CODE == 'ru' %}любой{% else %}any{% endif %}</button>
+                    </div>
+                </section>
+
+                <section class="rating-block">
+                    <h3>{% if LANGUAGE_CODE == 'ru' %}Рейтинг админов{% else %}Admin Priority Rating{% endif %}</h3>
+                    <div class="rating-controls">
+                        <div class="star-row" data-admin-rating-stars>
+                            <button type="button" class="star" data-star-value="1">&#9733;</button>
+                            <button type="button" class="star" data-star-value="2">&#9733;</button>
+                            <button type="button" class="star" data-star-value="3">&#9733;</button>
+                            <button type="button" class="star" data-star-value="4">&#9733;</button>
+                            <button type="button" class="star" data-star-value="5">&#9733;</button>
+                        </div>
+                        <button type="button" class="rating-reset-btn" data-admin-rating-reset>{% if LANGUAGE_CODE == 'ru' %}любой{% else %}any{% endif %}</button>
+                    </div>
+                </section>
+            </article>
+
+            <article class="tab-panel panel" data-tab-panel="description">
+                <h2>
+                    {% if current_mode == 'PVE' %}
+                        {% if LANGUAGE_CODE == 'ru' %}Описание места{% else %}Place Description{% endif %}
+                    {% else %}
+                        {% if LANGUAGE_CODE == 'ru' %}Описание спота{% else %}Spot Description{% endif %}
+                    {% endif %}
+                </h2>
+                <div class="description-content" data-description-content>
+                    {% if current_mode == 'PVE' %}
+                        {% if LANGUAGE_CODE == 'ru' %}Выберите пин, чтобы увидеть данные места.{% else %}Select a pin to view place data.{% endif %}
+                    {% else %}
+                        {% if LANGUAGE_CODE == 'ru' %}Выберите пин, чтобы увидеть данные спота.{% else %}Select a pin to view spot data.{% endif %}
+                    {% endif %}
+                </div>
+                <section class="spot-actions"
+                         data-spot-actions
+                         data-authenticated="{% if request.user.is_authenticated %}1{% else %}0{% endif %}"
+                         data-like-url-template="{% if current_mode == 'PVE' %}{% url 'maps:place_like_api' place_slug='__spot_slug__' %}{% else %}{% url 'maps:spot_like_api' spot_slug='__spot_slug__' %}{% endif %}"
+                         data-rate-url-template="{% if current_mode == 'PVE' %}{% url 'maps:place_rate_api' place_slug='__spot_slug__' %}{% else %}{% url 'maps:spot_rate_api' spot_slug='__spot_slug__' %}{% endif %}">
+                    <button type="button" class="like-btn" data-like-btn>
+                        <span data-like-btn-label>{% if LANGUAGE_CODE == 'ru' %}Лайк{% else %}Like{% endif %}</span>
+                        <span class="like-count" data-like-count>0</span>
+                    </button>
+                    <div class="spot-user-rating">
+                        <span class="spot-user-rating-label">{% if LANGUAGE_CODE == 'ru' %}Ваша оценка{% else %}Your rating{% endif %}</span>
+                        <div class="star-row" data-user-rate-stars>
+                            <button type="button" class="star" data-star-value="1">&#9733;</button>
+                            <button type="button" class="star" data-star-value="2">&#9733;</button>
+                            <button type="button" class="star" data-star-value="3">&#9733;</button>
+                            <button type="button" class="star" data-star-value="4">&#9733;</button>
+                            <button type="button" class="star" data-star-value="5">&#9733;</button>
+                        </div>
+                    </div>
+                </section>
+            </article>
+        </section>
+
+        <aside class="right-column panel">
+            <h2 class="spot-title" data-spot-title>{% if spots %}{{ spots.0.name }}{% else %}{% if LANGUAGE_CODE == 'ru' %}Нет спотов{% else %}No spots{% endif %}{% endif %}</h2>
+            <section class="media-slider" data-media-slider>
+                <div class="media-stage">
+                    <button class="media-nav media-nav-prev" type="button" data-media-nav="prev" aria-label="{% if LANGUAGE_CODE == 'ru' %}Предыдущий кадр{% else %}Previous media{% endif %}">&#10094;</button>
+                    <div class="media-viewer" data-main-media>{% if LANGUAGE_CODE == 'ru' %}Превью видео{% else %}Video Preview Placeholder{% endif %}</div>
+                    <button class="media-nav media-nav-next" type="button" data-media-nav="next" aria-label="{% if LANGUAGE_CODE == 'ru' %}Следующий кадр{% else %}Next media{% endif %}">&#10095;</button>
+                </div>
+                <div class="thumb-row-controls">
+                    <button class="thumb-scroll-btn" type="button" data-thumb-scroll="prev" aria-label="{% if LANGUAGE_CODE == 'ru' %}Прокрутить ленту влево{% else %}Scroll thumbs left{% endif %}">&#10094;</button>
+                    <div class="thumb-strip" data-thumb-strip></div>
+                    <button class="thumb-scroll-btn" type="button" data-thumb-scroll="next" aria-label="{% if LANGUAGE_CODE == 'ru' %}Прокрутить ленту вправо{% else %}Scroll thumbs right{% endif %}">&#10095;</button>
+                </div>
+            </section>
+            <div class="media-empty" data-media-empty hidden>
+                {% if current_mode == 'PVE' %}
+                    {% if LANGUAGE_CODE == 'ru' %}Для этого места пока нет медиа.{% else %}No media for this place yet.{% endif %}
+                {% else %}
+                    {% if LANGUAGE_CODE == 'ru' %}Для этого спота пока нет медиа.{% else %}No media for this spot yet.{% endif %}
+                {% endif %}
+            </div>
+
+        </aside>
+    </div>
+</section>
+{{ spot_payload|json_script:"spot-data-json" }}
+{{ LANGUAGE_CODE|json_script:"language-code-json" }}
+{% endblock %}

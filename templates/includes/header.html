@@ -1,0 +1,34 @@
+<header class="site-header">
+    <div class="header-left">
+        <a class="logo-link" href="{% url 'maps:maps_home' mode=current_mode|default:'PVP' %}" aria-label="PASASA">
+            <img src="/media/hud/pasasafont.svg" alt="PASASA" class="logo-link-image">
+        </a>
+    </div>
+    <div class="header-center mode-switch" data-mode-switch>
+        <a class="mode-btn {% if current_mode|default:'PVP' == 'PVP' %}is-active{% endif %}"
+           href="{% if map_obj %}{% url 'maps:map_detail' mode='PVP' map_slug=map_obj.slug %}{% else %}{% url 'maps:maps_home' mode='PVP' %}{% endif %}"
+           data-mode="PVP">PVP</a>
+        <a class="mode-btn {% if current_mode == 'PVE' %}is-active{% endif %}"
+           href="{% if map_obj %}{% url 'maps:map_detail' mode='PVE' map_slug=map_obj.slug %}{% else %}{% url 'maps:maps_home' mode='PVE' %}{% endif %}"
+           data-mode="PVE">PVE</a>
+    </div>
+    <div class="header-right">
+        <a class="profile-btn" href="{% url 'catalog:list' kind='maps' %}">Каталог</a>
+        <form action="{% url 'set_language' %}" method="post" class="lang-switch">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" name="language" value="en" class="lang-btn {% if LANGUAGE_CODE == 'en' %}is-active{% endif %}">EN</button>
+            <button type="submit" name="language" value="ru" class="lang-btn {% if LANGUAGE_CODE == 'ru' %}is-active{% endif %}">RU</button>
+        </form>
+        {% if request.user.is_authenticated %}
+            <form class="header-logout" action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="profile-btn" type="submit">Вийти</button></form>
+            <a class="profile-btn" href="{% url 'maps:profile' profile_key=request.user.username %}" aria-label="{% if LANGUAGE_CODE == 'ru' %}Открыть профиль{% else %}Open profile{% endif %}">
+                {% if LANGUAGE_CODE == 'ru' %}Профиль{% else %}Profile{% endif %}
+            </a>
+        {% else %}
+            <a class="profile-btn" href="{% url 'login' %}" aria-label="{% if LANGUAGE_CODE == 'ru' %}Войти{% else %}Sign in{% endif %}">
+                {% if LANGUAGE_CODE == 'ru' %}Войти{% else %}Sign in{% endif %}
+            </a>
+        {% endif %}
+    </div>
+</header>
