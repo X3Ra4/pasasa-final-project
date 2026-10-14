@@ -8,7 +8,8 @@ const id = (value: unknown): value is string => string(value) && /^\d{1,12}$/.te
 function validMeal(value: unknown): value is Meal {
   if (!object(value) || !id(value.id) || !string(value.name) || !value.name || !string(value.image) ||
     !string(value.instructions) || !string(value.source) || !string(value.video) || !Array.isArray(value.ingredients)) return false;
-  return (!value.image || value.image.startsWith('https://')) && (!value.source || value.source.startsWith('https://')) &&
+  return (value.category === undefined || string(value.category)) && (value.area === undefined || string(value.area)) &&
+    (!value.image || value.image.startsWith('https://')) && (!value.source || value.source.startsWith('https://')) &&
     (!value.video || value.video.startsWith('https://')) && value.ingredients.every(item => object(item) && string(item.name) && string(item.amount));
 }
 export function parseStored(raw: string | null): AppData {

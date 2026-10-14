@@ -40,6 +40,11 @@ describe('API boundary', () => {
 });
 
 describe('local data', () => {
+  it.each([{}, [], 12])('rejects malformed optional recipe metadata %j', invalid => {
+    for (const field of ['category', 'area']) {
+      expect(() => parseStored(JSON.stringify({ ...emptyData(), favorites: { [meal.id]: { ...meal, [field]: invalid } } }))).toThrow();
+    }
+  });
   it('provides clean first-run defaults', () => expect(parseStored(null)).toEqual(emptyData()));
   it('restores favorites, theme and notes', () => {
     const data = { ...emptyData(), theme: 'dark', favorites: { [meal.id]: meal }, notes: { [meal.id]: 'Less salt' } };

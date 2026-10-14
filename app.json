@@ -1,13 +1,14 @@
 {
   "expo": {
-    "name": "smak-native",
-    "slug": "smak-native",
+    "name": "Smak",
+    "slug": "smak-recipes",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.x3ra4.smak"
     },
     "android": {
       "adaptiveIcon": {
@@ -16,14 +17,18 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.x3ra4.smak"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "output": "single"
     },
     "plugins": [
       "expo-router",
-      "expo-image"
-    ]
+      "expo-image",
+      "expo-font"
+    ],
+    "scheme": "smak"
   }
 }
