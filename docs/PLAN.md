@@ -29,4 +29,4 @@ Archived tasks cannot be modified by an assignee. Escape comments; enforce CSRF 
 ## Progress
 Initial: empty orphan branch, clean baseline; previous PASASA branches preserved.
 
-Verification: SQLite 29 passed / 4 PostgreSQL-only skipped; PostgreSQL 33 passed. Browser and real container HTTP passed. Independent review findings TF-B01..03 fixed with regression tests. Publication is the remaining delivery action.
+Verification: SQLite 29 passed / 4 PostgreSQL-only skipped; PostgreSQL 33 passed. Browser and real container HTTP passed. Independent review findings TF-B01..03 fixed with regression tests. Published to taskflow-team-project; actual closed GitHub Issues #1–4 record delivery and verified defect fixes.
