@@ -11,7 +11,7 @@ Constraints: no personal database or user uploads in Git; Python 3.12-compatible
 - [x] Add repeatable demo seed command, configuration and dependencies.
 - [x] Run all tests, migration checks and a fresh database startup; inspect the UI and capture screenshots.
 - [x] Write README, theme description, requirement mapping and defense walkthrough.
-- [ ] Review changes, create the new GitHub repository, push and verify remote contents.
+- [x] Review changes, create the new GitHub repository, push and verify remote contents.
 
 Review focus: another user's object; nonstaff map mutations; deleting a map with locations; invalid coordinates/filter values; repeat demo seeding without overwriting edits.
 
@@ -20,3 +20,5 @@ Verification: 17 Django tests pass; check reports no issues; makemigrations --ch
 Independent review: identified optional PvE fields causing invisible markers and mixed-null resource sorting failures. Both reproduced by failing tests, then fixed; full suite passed. No unresolved important review findings.
 
 Implementation decisions: preserve optional nullable fields in existing schema for compatibility; require complete data in new public forms and handle legacy null resources in the interactive view. Use Django 5.2 LTS for Python 3.12 compatibility. No private source database, credentials or user uploads are included in publication.
+
+Published to https://github.com/X3Ra4/pasasa-final-project on branch main. Remote commit matched the local commit; the public GitHub tree contains README, topic, defense walkthrough, tests and all six screenshots.
